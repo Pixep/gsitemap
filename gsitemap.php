@@ -391,9 +391,9 @@ class Gsitemap extends Module
             $url = $link->getProductLink($product, $product->link_rewrite, htmlspecialchars(strip_tags($product->category)), $product->ean13, (int) $lang['id_lang'], (int) $this->context->shop->id, 0);
 
             $images_product = array();
-            foreach($product->getImages($lang) as $id_image) {
-                if (isset($id_image['id_image'])) {
-                    $image_link = $this->context->link->getImageLink($product->link_rewrite, $product->id . '-' . (int) $id_image['id_image'], ImageType::getFormattedName('large'));
+            foreach($product->getImages($lang) as $product_image) {
+                if (isset($product_image['id_image'])) {
+                    $image_link = $this->context->link->getImageLink($product->link_rewrite, $product->id . '-' . (int) $product_image['id_image'], ImageType::getFormattedName('large'));
                     $image_link = (!in_array(rtrim(Context::getContext()->shop->virtual_uri, '/'), explode('/', $image_link))) ? str_replace(array(
                         'https',
                         Context::getContext()->shop->domain . Context::getContext()->shop->physical_uri,
@@ -404,9 +404,10 @@ class Gsitemap extends Module
                 }
                 $file_headers = (Configuration::get('GSITEMAP_CHECK_IMAGE_FILE')) ? @get_headers($image_link) : true;
                 if (isset($image_link) && ($file_headers[0] != 'HTTP/1.1 404 Not Found' || $file_headers === true)) {
+                    $caption = !empty($product_image['legend']) ? $product_image['legend'] : $product->meta_description;
                     $images_product[] = array(
                         'title_img' => htmlspecialchars(strip_tags($product->name)),
-                        'caption' => htmlspecialchars(strip_tags($product->meta_description)),
+                        'caption' => htmlspecialchars(strip_tags($caption)),
                         'link' => $image_link,
                     );
                 }
